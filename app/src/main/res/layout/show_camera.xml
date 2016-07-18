@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <org.opencv.android.JavaCameraView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        android:id="@+id/show_camera_activity_java_surface_view"
+        opencv:show_fps="true"
+        opencv:camera_id="any" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_dialog_map" />
+
+    <TextView
+        android:id="@+id/view_text"
+        android:layout_width="158dp"
+        android:layout_height="66dp"
+        android:text="Hello World!"
+        android:background="#9b0101"
+        android:textColor="#fffefe"
+        android:layout_gravity="left|bottom" />
+
+    <TextView
+        android:id="@+id/txtAngle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="20dp"
+        android:text="Heading: 0.0"
+        android:layout_gravity="center_horizontal|bottom"
+        android:textColor="#fcfbfb" />
+
+    <ImageView
+        android:id="@+id/imgViewCompass"
+        android:layout_width="151dp"
+        android:layout_height="111dp"
+        android:layout_below="@+id/txtAngle"
+        android:layout_centerHorizontal="true"
+        android:src="@android:drawable/arrow_up_float"
+        android:layout_gravity="center" />
+</FrameLayout>
