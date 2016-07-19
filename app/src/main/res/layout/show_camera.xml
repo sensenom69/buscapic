@@ -42,6 +42,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:textColor="#fcfbfb" />
 
+
     <ImageView
         android:id="@+id/imgViewCompass"
         android:layout_width="151dp"
