@@ -1,7 +1,9 @@
 package com.example.sense.opencv_test_3;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Surface;
@@ -46,7 +49,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements CvCameraViewListener2{
+public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     //Les dades per a tirar la linea
     private double latitut;
     private double longitud;
@@ -78,15 +81,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();//This variable acts as a bridge between camera and OpenCV library.
-                } break;
-                default:
-                {
+                }
+                break;
+                default: {
                     super.onManagerConnected(status);
-                } break;
+                }
+                break;
             }
         }
     };//Well, once OpenCV library is loaded, you may want to perform some actions. For example, displaying a success or failure message.
@@ -134,7 +137,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         final MyLocationListener mlocListener = new MyLocationListener();
-        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,(LocationListener) mlocListener);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) mlocListener);
         TextView textView = (TextView) findViewById(R.id.view_text);
         textView.setText("Funcionant");
         imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
