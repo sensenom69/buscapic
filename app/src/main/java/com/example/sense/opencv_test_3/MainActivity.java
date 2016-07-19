@@ -1,6 +1,7 @@
 package com.example.sense.opencv_test_3;
 
 import android.content.Context;
+import android.content.Loader;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -46,6 +47,10 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2{
+    //Les dades per a tirar la linea
+    private double latitut;
+    private double longitud;
+    private double angle;
     //La brujula
     private SensorManager sensorManager;
     private MyBrujula brujula;
@@ -128,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mOpenCvCameraView.setMaxFrameSize(600, 3000);
 
         LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        MyLocationListener mlocListener = new MyLocationListener();
+        final MyLocationListener mlocListener = new MyLocationListener();
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,(LocationListener) mlocListener);
         TextView textView = (TextView) findViewById(R.id.view_text);
         textView.setText("Funcionant");
@@ -139,7 +144,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         fab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(), "click", Toast.LENGTH_LONG).show();
+                latitut = mlocListener.latitud;
+                longitud = mlocListener.longitud;
+                angle = brujula.getAngle();
+                Toast.makeText(getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -242,19 +250,25 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     }
 
     public class MyLocationListener implements LocationListener {
+        public double latitud = 0;
+        public double longitud = 0;
+        public double bearing = 0;
 
         @Override
         public void onLocationChanged(Location loc) {
+
             // Este mŽtodo se ejecuta cada vez que el GPS recibe nuevas coordenadas
             // debido a la detecci—n de un cambio de ubicacion
-            loc.getLatitude();
-            loc.getLongitude();
+            latitud = loc.getLatitude();
+            longitud =loc.getLongitude();
+            bearing = loc.getBearing();
             String Text = "Mi ubicaci—n actual es: " + "\n Lat = "
-                    + loc.getLatitude() + "\n Long = " + loc.getLongitude();
+                    + loc.getLatitude() + "\n Long = " + loc.getLongitude()+""
+                    +"\n bearing = "+loc.getBearing();
             TextView text = (TextView) findViewById(R.id.view_text);
             text.setText(Text);
-            Toast.makeText(getApplicationContext(),Text,Toast.LENGTH_LONG);
 
+            Toast.makeText(getApplicationContext(),Text,Toast.LENGTH_LONG);
 
         }
 
@@ -285,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             // espera que este disponible en breve
             // AVAILABLE -> Disponible
         }
+
     }
 
     public class MyBrujula implements SensorEventListener{
@@ -339,13 +354,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 float RotationMatrix[] = new float[16];
                 float RI[] = new float[9];
                 float I[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(RI, I, mGravity, mGeomagnetic);
+                boolean success = SensorManager.getRotationMatrix(RI, null, mGravity, mGeomagnetic);
 
                 if (success) {
                     float orientation[] = new float[3];
                     SensorManager.getOrientation(RI, orientation);
-                    azimut = orientation[0] * (180 / (float) Math.PI);
-                    //azimut = (float) Math.toDegrees(orientation[0]);
+                    //azimut = orientation[0] * (180 / (float) Math.PI);
+                    azimut = (float) Math.toDegrees(orientation[0]);
                 }
             }
             degree = azimut;
@@ -369,6 +384,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+        }
+
+        public double getAngle(){
+            return degree;
         }
 
         /*
