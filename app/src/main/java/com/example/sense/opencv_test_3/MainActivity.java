@@ -47,6 +47,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
@@ -54,9 +56,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private double latitut;
     private double longitud;
     private double angle;
+    //el desti en km
     private double latitudDesti;
     private double longitudDesti;
     private double distancia;
+    private double altitud;
+    private ArrayList<Punt> llistaPunts = new ArrayList<>();
     //La brujula
     private SensorManager sensorManager;
     private MyBrujula brujula;
@@ -169,7 +174,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 distancia = 100;
                 latitudDesti = getLatDesti(latitut,angle,distancia);
                 longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
-
+                TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
+                tareaRecollirAltimetria.setLlistaPunts(llistaPunts);
+                tareaRecollirAltimetria.execute(latitut,longitud,latitudDesti,longitudDesti);
                 Toast.makeText(getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();
 
             }
@@ -311,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
             latitud = loc.getLatitude();
             longitud = loc.getLongitude();
+            altitud = loc.getAltitude();
             String Text = "Mi ubicaci—n actual es: " + "\n Lat = "
                     + loc.getLatitude() + "\n Long = " + loc.getLongitude()+""
                     +"\n bearing = "+loc.getBearing();
