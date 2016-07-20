@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private double latitut;
     private double longitud;
     private double angle;
+    private double latitudDesti;
+    private double longitudDesti;
+    private double distancia;
     //La brujula
     private SensorManager sensorManager;
     private MyBrujula brujula;
@@ -160,7 +163,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 latitut = mlocListener.latitud;
                 longitud = mlocListener.longitud;
                 angle = brujula.getAngle();
+                latitut = 39.070622;
+                longitud = -0.269588;
+                angle = 177.5;
+                distancia = 100;
+                latitudDesti = getLatDesti(latitut,angle,distancia);
+                longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
+
                 Toast.makeText(getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();
+
             }
         });
     }
@@ -262,6 +273,31 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         return super.onOptionsItemSelected(item);
     }
 
+    public double getLatDesti(double lat, double graus, double distancia){
+
+        double latitudRadi =Math.toRadians(lat);
+        double grausRadians = Math.toRadians(graus);
+        int radiTerra = 6371;
+
+        return  Math.toDegrees(Math.asin(Math.sin(latitudRadi)*Math.cos(distancia/radiTerra) + Math.cos(latitudRadi)*Math.sin(distancia/radiTerra)*Math.cos(grausRadians)));
+
+    }
+
+    public double getLongDesti(double longi, double lat, double graus, double distancia){
+        /*
+        double longitudRadi =longi;
+        double grausRadians = graus;
+        double coseno = Math.cos(grausRadians);
+        double dist = (360*distancia)/(2*3.141516*6371000);
+        double resultatEnGrau = longitudRadi + coseno * dist;
+        */
+        int radiTerra = 6371;
+        double lati =  getLatDesti(lat,graus,distancia);
+        double longitud =Math.toRadians(longi) + Math.atan2(Math.sin(Math.toRadians(angle))*Math.sin(distancia/radiTerra)*Math.cos(Math.toRadians(lat)), Math.cos(distancia/radiTerra)-Math.sin(Math.toRadians(lat))*Math.sin(Math.toRadians(lati)));
+        longitud = (Math.toDegrees(longitud)+540)%360-180;
+        return longitud;
+    }
+
     public class MyLocationListener implements LocationListener {
         public double latitud = 0;
         public double longitud = 0;
@@ -272,9 +308,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
             // Este mŽtodo se ejecuta cada vez que el GPS recibe nuevas coordenadas
             // debido a la detecci—n de un cambio de ubicacion
+
             latitud = loc.getLatitude();
-            longitud =loc.getLongitude();
-            bearing = loc.getBearing();
+            longitud = loc.getLongitude();
             String Text = "Mi ubicaci—n actual es: " + "\n Lat = "
                     + loc.getLatitude() + "\n Long = " + loc.getLongitude()+""
                     +"\n bearing = "+loc.getBearing();
