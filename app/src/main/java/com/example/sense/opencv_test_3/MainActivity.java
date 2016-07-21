@@ -169,10 +169,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 latitut = mlocListener.latitud;
                 longitud = mlocListener.longitud;
                 angle = brujula.getAngle();
-                latitut = 39.070622;
-                longitud = -0.269588;
-                angle = 177.5;
-                distancia = 100;
+                //Laboratori
+                //latitut = 39.070622;
+                //longitud = -0.269588;
+                //angle = 177.5;
+                //Casa
+                latitut = 39.068727;
+                longitud = -0.291360;
+                //angle = 162;//moduver desde casa
+                //angle = 179;//penyalba
+                angle=50;//Creus
+                distancia = 50;
                 latitudDesti = getLatDesti(latitut,angle,distancia);
                 longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
                 TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
@@ -560,7 +567,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             }
 
             try{
-                return getDades(respostaJsonStr);
+                ArrayList<Punt> retorno = getDades(respostaJsonStr);
+                return retorno;
             }catch (JSONException e){
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -571,12 +579,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         @Override
         protected void onPostExecute(ArrayList<Punt> result) {
             super.onPostExecute(result);
-            Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
 
             LlistaPunts llistaPunts = new LlistaPunts(llistaPuntsRetornada);
-            llistaPunts.calculaPuntMesAlt();
-            Punt puntMesAlt = llistaPunts.getPuntMesAlt();
-
+            //llistaPunts.calculaPuntMesAlt();
+            //Punt puntMesAlt = llistaPunts.getPuntMesAlt();
+            Punt puntMesAltVisible = llistaPunts.getPuntMesAltVisible();
+            Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
         }
 
         private ArrayList<Punt> getDades(String resposta) throws JSONException{
