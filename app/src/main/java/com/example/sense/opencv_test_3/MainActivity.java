@@ -16,12 +16,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Surface;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -32,16 +32,17 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opencv.android.JavaCameraView;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.BufferedReader;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mRgba;
     Mat mRgbaF;
     Mat mRgbaT;
+    Mat mIntermediateMat;
+
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         //Now, lets call OpenCV manager to help our app communicate with android phone to make OpenCV work
@@ -129,11 +132,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
+
+        //bruixola
         brujula = new MyBrujula();
         brujula.llansa();
-
         sensorManager = brujula.getmSensorManager();
+        //////
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.show_camera);
 
         mOpenCvCameraView = (JavaCameraView) findViewById(R.id.show_camera_activity_java_surface_view);
@@ -142,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        mOpenCvCameraView.setMaxFrameSize(600, 3000);
+        mOpenCvCameraView.setMaxFrameSize(600, 650);
 
         LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         final MyLocationListener mlocListener = new MyLocationListener();
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) mlocListener);
         TextView textView = (TextView) findViewById(R.id.view_text);
-        textView.setText("Funcionant");
+        textView.setText("Esperant GPS");
         imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
         txtAngle = (TextView) findViewById(R.id.txtAngle);
         //El boto flotant
@@ -232,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mRgbaF = new Mat(height, width, CvType.CV_8UC4);
         mRgbaT = new Mat(width, width, CvType.CV_8UC4);
+        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
     }
 
     //Destroy image data when you stop camera preview on your phone screen
@@ -243,23 +251,52 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     // So if the app is in portrait more, camera will be in -90 or 270 degrees orientation.
     // We fix that in the next and the most important function. There you go!
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+
         mRgba = inputFrame.rgba();
+        Size sizeRgba = mRgba.size();
+        Mat rgbaInnerWindow;
+
+        int rows = (int) sizeRgba.height;
+        int cols = (int) sizeRgba.width;
+
+        int left = cols / 7;
+        int top = rows / 3;
+
+        int width = cols * 3 / 24;
+        int height = rows * 3 / 10;
         switch (mOpenCvCameraView.getDisplay().getRotation()) {
             case Surface.ROTATION_0: // Vertical portrait
+                /*
                 Core.transpose(mRgba, mRgbaT);
                 Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
                 Core.flip(mRgbaF, mRgba, 1);
+                */
+                rgbaInnerWindow = mRgba.submat(top, top + height, left, left + width);
+                Imgproc.Canny(rgbaInnerWindow, mIntermediateMat, 80, 90);
+                Imgproc.cvtColor(mIntermediateMat, rgbaInnerWindow, Imgproc.COLOR_GRAY2BGRA, 4);
+                Core.transpose(mRgba, mRgbaT);
+                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
+                Core.flip(mRgbaF, mRgba, 1);
+                rgbaInnerWindow.release();
                 break;
             case Surface.ROTATION_90: // 90° anti-clockwise
+
+
                 break;
             case Surface.ROTATION_180: // Vertical anti-portrait
+
                 Core.transpose(mRgba, mRgbaT);
                 Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
                 Core.flip(mRgbaF, mRgba, 0);
+
+
                 break;
             case Surface.ROTATION_270: // 90° clockwise
+
                 Imgproc.resize(mRgba, mRgbaF, mRgbaF.size(), 0,0, 0);
                 Core.flip(mRgbaF, mRgba, -1);
+
+
                 break;
             default:
         }

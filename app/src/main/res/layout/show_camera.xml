@@ -6,13 +6,12 @@
     android:layout_height="match_parent">
 
     <org.opencv.android.JavaCameraView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:visibility="gone"
         android:id="@+id/show_camera_activity_java_surface_view"
-        opencv:show_fps="true"
-        opencv:camera_id="any" />
-
+        opencv:camera_id="any"
+        android:layout_gravity="top" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -51,4 +50,13 @@
         android:layout_centerHorizontal="true"
         android:src="@android:drawable/arrow_up_float"
         android:layout_gravity="center" />
+    <ImageView
+        android:id="@+id/imgRectangle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/rectangle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="125dp" />
+
 </FrameLayout>
