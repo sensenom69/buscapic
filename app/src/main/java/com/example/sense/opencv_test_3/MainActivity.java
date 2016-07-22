@@ -177,15 +177,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 longitud = mlocListener.longitud;
                 angle = brujula.getAngle();
                 //Laboratori
-                //latitut = 39.070622;
-                //longitud = -0.269588;
-                //angle = 177.5;
+                latitut = 39.070622;
+                longitud = -0.269588;
+                angle = 177.5;//moduver desde laboratori
                 //Casa
-                latitut = 39.068727;
-                longitud = -0.291360;
+                //latitut = 39.068727;
+                //longitud = -0.291360;
                 //angle = 162;//moduver desde casa
                 //angle = 179;//penyalba
-                angle=50;//Creus
+                //angle=50;//Creus
                 distancia = 50;
                 latitudDesti = getLatDesti(latitut,angle,distancia);
                 longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
@@ -468,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             degree = azimut;
             txtAngle.setText("Angle: " + Math.round((degree)) + " degrees");
             // se crea la animacion de la rottacion (se revierte el giro en grados, negativo)
+
             RotateAnimation ra = new RotateAnimation(
                     currentDegree,
                     degree,
@@ -621,6 +622,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             //llistaPunts.calculaPuntMesAlt();
             //Punt puntMesAlt = llistaPunts.getPuntMesAlt();
             Punt puntMesAltVisible = llistaPunts.getPuntMesAltVisible();
+            TextView text = (TextView) findViewById(R.id.txtAltura);
+
+            text.setText(Math.round(puntMesAltVisible.getAltura())+"m");
             Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
         }
 
