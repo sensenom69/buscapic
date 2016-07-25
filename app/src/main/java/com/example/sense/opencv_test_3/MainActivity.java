@@ -43,6 +43,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -53,6 +54,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
+//TODO: per que quan llance varies vegades no canvia laltura?
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     //Les dades per a tirar la linea
@@ -187,8 +191,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 //longitud = -0.269588;
                 //angle = 177.5;//moduver desde laboratori
                 //Casa
-                //latitut = 39.068727;
-                //longitud = -0.291360;
+                latitut = 39.068727;
+                longitud = -0.291360;
                 //angle = 162;//moduver desde casa
                 //angle = 179;//penyalba
                 //angle=50;//Creus
@@ -279,12 +283,16 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 Core.flip(mRgbaF, mRgba, 1);
                 */
                 rgbaInnerWindow = mRgba.submat(top, top + height, left, left + width);
-                Imgproc.Canny(rgbaInnerWindow, mIntermediateMat, 80, 90);
+                Mat imageBlurr = rgbaInnerWindow;
+                Imgproc.GaussianBlur(rgbaInnerWindow, imageBlurr, new Size(5,5), 45);
+                Imgproc.Canny(imageBlurr, mIntermediateMat, 80, 90);
                 Imgproc.cvtColor(mIntermediateMat, rgbaInnerWindow, Imgproc.COLOR_GRAY2BGRA, 4);
-                Core.transpose(mRgba, mRgbaT);
-                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
-                Core.flip(mRgbaF, mRgba, 1);
-                rgbaInnerWindow.release();
+                List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+                //Imgproc.findContours(mIntermediateMat, contours, new Mat(), Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
+                //TODO: fer us de houghlines o algo paregut en punts
+
+
+
                 break;
             case Surface.ROTATION_90: // 90° anti-clockwise
 
@@ -678,7 +686,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 //El objecte del punt
                 JSONObject dadesPunt  = alturesArray.getJSONObject(i);
                 double altura = dadesPunt.getDouble("elevation");
-                //TODO aci casca
 
                 JSONObject dadesLocalitzacioPunt  = dadesPunt.getJSONObject("location");
 
