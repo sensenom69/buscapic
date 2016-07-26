@@ -42,22 +42,7 @@
         android:textColor="#fcfbfb" />
 
 
-    <ImageView
-        android:id="@+id/imgViewCompass"
-        android:layout_width="151dp"
-        android:layout_height="111dp"
-        android:layout_below="@+id/txtAngle"
-        android:layout_centerHorizontal="true"
-        android:src="@android:drawable/arrow_up_float"
-        android:layout_gravity="center" />
-    <ImageView
-        android:id="@+id/imgRectangle"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/rectangle"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="125dp" />
+
     <TextView
         android:id="@+id/txtAltura"
         android:layout_width="wrap_content"

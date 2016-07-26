@@ -44,8 +44,11 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) mlocListener);
         TextView textView = (TextView) findViewById(R.id.view_text);
         textView.setText("Esperant GPS");
-        imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
+        //imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
         txtAngle = (TextView) findViewById(R.id.txtAngle);
         //El boto flotant
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -274,7 +277,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         int top = rows / 3;
 
         int width = cols * 3 / 24;
-        int height = rows * 3 / 10;
+        int height = rows * 3 / 8;
+
         switch (mOpenCvCameraView.getDisplay().getRotation()) {
             case Surface.ROTATION_0: // Vertical portrait
                 /*
@@ -283,16 +287,37 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 Core.flip(mRgbaF, mRgba, 1);
                 */
                 rgbaInnerWindow = mRgba.submat(top, top + height, left, left + width);
-                Mat imageBlurr = rgbaInnerWindow;
+                Mat imageBlurr = mRgba.submat(top, top + height, left, left + width);
                 Imgproc.GaussianBlur(rgbaInnerWindow, imageBlurr, new Size(5,5), 45);
-                Imgproc.Canny(imageBlurr, mIntermediateMat, 80, 90);
-                Imgproc.cvtColor(mIntermediateMat, rgbaInnerWindow, Imgproc.COLOR_GRAY2BGRA, 4);
+
+                Mat grayscaledMat = new Mat();
+                Imgproc.cvtColor(rgbaInnerWindow, grayscaledMat, Imgproc.COLOR_BGR2GRAY, 4);
+                Mat cannyOut = new Mat();
+                Imgproc.Canny(grayscaledMat, cannyOut, 5, 25);
                 List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-                //Imgproc.findContours(mIntermediateMat, contours, new Mat(), Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
-                //TODO: fer us de houghlines o algo paregut en punts
+                Imgproc.findContours(cannyOut, contours, new Mat(), Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_NONE );
+                List<Point> llistaMesAlts = new ArrayList<>();
+                for(int i=0; i< contours.size();i++){
+                    System.out.println(Imgproc.contourArea(contours.get(i)));
+                    if (Imgproc.contourArea(contours.get(i)) > 0 ){
+                        List<Point> listaPuntos = new ArrayList<Point>();
+                        Converters.Mat_to_vector_Point(contours.get(i),listaPuntos);
+                        int puntMesAlt = getPuntMesAlt(listaPuntos);
+                        llistaMesAlts.add(listaPuntos.get(puntMesAlt));
+                        Imgproc.rectangle(rgbaInnerWindow,new Point(listaPuntos.get(puntMesAlt).x+5,listaPuntos.get(puntMesAlt).y+5),new Point(listaPuntos.get(puntMesAlt).x,listaPuntos.get(puntMesAlt).y), new Scalar(255,0,0));
+                    }
+                }
+                if(llistaMesAlts.size()>0) {
+                    int puntMesAltTotal = getPuntMesAlt(llistaMesAlts);
+                    Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
+                }
+                Imgproc.rectangle(rgbaInnerWindow,new Point(width-5,height-3),new Point(0,0), new Scalar(255,0,0));
 
+                Core.transpose(mRgba, mRgbaT);
+                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
 
-
+                Core.flip(mRgbaF, mRgba, 1);
+                imageBlurr.release();
                 break;
             case Surface.ROTATION_90: // 90° anti-clockwise
 
@@ -316,6 +341,20 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             default:
         }
         return mRgba;
+    }
+
+
+
+    public int getPuntMesAlt(List<Point> llistaPunts){
+        int primerPunt = 0;
+        double auxY=100000;
+        for(int i=0;i<llistaPunts.size();i++){
+            if(llistaPunts.get(i).x < auxY){
+                auxY = llistaPunts.get(i).x;
+                primerPunt = i;
+            }
+        }
+        return primerPunt;
     }
 
     @Override
@@ -529,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             // establecer la animación después del final de la estado de reserva
             ra.setFillAfter(true);
             // Inicio de la animacion
-            imgCompass.startAnimation(ra);
+            //imgCompass.startAnimation(ra);
             currentDegree = -degree;
         }
 
