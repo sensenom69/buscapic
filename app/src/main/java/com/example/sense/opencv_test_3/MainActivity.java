@@ -273,11 +273,11 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         int rows = (int) sizeRgba.height;
         int cols = (int) sizeRgba.width;
 
-        int left = cols / 7;
-        int top = rows / 3;
+        int left = 0;
+        int top = rows/4;
 
-        int width = cols * 3 / 24;
-        int height = rows * 3 / 8;
+        int width = cols * 3 / 8;
+        int height = rows * 3 / 7;
 
         switch (mOpenCvCameraView.getDisplay().getRotation()) {
             case Surface.ROTATION_0: // Vertical portrait
@@ -311,7 +311,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                     int puntMesAltTotal = getPuntMesAlt(llistaMesAlts);
                     Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
                 }
-                Imgproc.rectangle(rgbaInnerWindow,new Point(width-5,height-3),new Point(0,0), new Scalar(255,0,0));
+                Imgproc.rectangle(rgbaInnerWindow,new Point(width-1,height-110),new Point(0,height/2.5), new Scalar(255,0,0));
+
 
                 Core.transpose(mRgba, mRgbaT);
                 Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
