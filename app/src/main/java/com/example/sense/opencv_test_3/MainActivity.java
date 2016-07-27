@@ -62,6 +62,12 @@ import java.util.List;
 //TODO: per que quan llance varies vegades no canvia laltura?
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
+    //En la RA el punt mes alt dins la visió.
+    private Point puntMesAlt = new Point(0,0);
+    //En la RA el recuadre que dellimita el pic
+    private Point cantoDretaDalt;
+    private Point cantoEsquerreBaix;
+
     //Les dades per a tirar la linea
     private double latitut;
     private double longitud;
@@ -309,9 +315,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 }
                 if(llistaMesAlts.size()>0) {
                     int puntMesAltTotal = getPuntMesAlt(llistaMesAlts);
+                    puntMesAlt = llistaMesAlts.get(puntMesAltTotal);
                     Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
                 }
-                Imgproc.rectangle(rgbaInnerWindow,new Point(width-1,height-110),new Point(0,height/2.5), new Scalar(255,0,0));
+
+                //cantoDretaDalt = new Point(70,height/2.5);
+                //cantoEsquerreBaix =  new Point(width-20,height-110);
+                cantoDretaDalt = new Point(width/2,(height/2)-30);
+                cantoEsquerreBaix =  new Point((width/2),(height/2)+30);
+                Imgproc.rectangle(rgbaInnerWindow, cantoEsquerreBaix,cantoDretaDalt, new Scalar(255,0,0));
 
 
                 Core.transpose(mRgba, mRgbaT);
