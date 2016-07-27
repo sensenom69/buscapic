@@ -9,9 +9,15 @@ public class LlistaPunts {
     private ArrayList<Punt> llistaPunts;
     private int posPuntMesAlt;
     private int posPuntMesAltVisible;
+
     public LlistaPunts(ArrayList<Punt> llistaPunts){
         this.llistaPunts = llistaPunts;
         posPuntMesAlt = llistaPunts.size();
+    }
+
+    public void resetLlistaPunts(){
+        llistaPunts.clear();
+        posPuntMesAltVisible = 1000000;
     }
 
     public ArrayList<Punt> getLlistaPunts(){
