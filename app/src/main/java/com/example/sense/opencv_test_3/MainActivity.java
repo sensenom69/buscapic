@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,13 +59,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: per que quan llance varies vegades no canvia laltura?
+//TODO: fer un progressBar
+//TODO: llevar el show_Camera de la v21
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     //Per al gps i el temporitzador
     MyLocationListener mlocListener;
     //El temporitzador
     private TemporitzarLlansament temporitzarLlansament =  new TemporitzarLlansament();
+    ProgressBar progressBar;
     //En la RA el punt mes alt dins la visió.
     private Point puntMesAlt = new Point(0,0);
     //En la RA el recuadre que dellimita el pic
@@ -152,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
 
+        //Temporitzador
+
+
 
         //bruixola
         brujula = new MyBrujula();
@@ -208,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 longitud = -0.291360;
                 //angle = 162;//moduver desde casa
                 //angle = 179;//penyalba
-                //angle=50;//Creus
+                angle=50;//Creus
                 distancia = 30;
                 latitudDesti = getLatDesti(latitut,angle,distancia);
                 longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
@@ -285,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         int cols = (int) sizeRgba.width;
 
         int left = 0;
-        int top = rows/4;
+        int top = (rows/4)+25;
 
         int width = cols * 3 / 8;
         int height = rows * 3 / 7;
@@ -302,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
                 //cantoDretaDalt = new Point(70,height/2.5);
                 //cantoEsquerreBaix =  new Point(width-20,height-110);
-                cantoDretaDalt = new Point(70,height/2.5);
+                cantoDretaDalt = new Point(70,height/2.6);
                 cantoEsquerreBaix =  new Point(width-20,height-110);
 
 
@@ -330,27 +336,32 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                     puntMesAlt = llistaMesAlts.get(puntMesAltTotal);
                     Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
                     //if(temporitzarLlansament.voltesPasades(cantoDretaDalt,cantoEsquerreBaix,new Point(80,120)))
-                    if(temporitzarLlansament.estaDins(cantoDretaDalt,cantoEsquerreBaix,llistaMesAlts.get(puntMesAltTotal))>10){
-                        latitut = mlocListener.latitud;
-                        longitud = mlocListener.longitud;
-                        angle = brujula.getAngle();
-                        //Laboratori
-                        //latitut = 39.070622;
-                        //longitud = -0.269588;
-                        //angle = 177.5;//moduver desde laboratori
-                        //Casa
-                        latitut = 39.068727;
-                        longitud = -0.291360;
-                        //angle = 162;//moduver desde casa
-                        //angle = 179;//penyalba
-                        //angle=50;//Creus
-                        distancia = 30;
-                        latitudDesti = getLatDesti(latitut,angle,distancia);
-                        longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
-                        TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
-                        llistaPuntsRetornada.clear();
-                        tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
-                        tareaRecollirAltimetria.execute(latitut,longitud,latitudDesti,longitudDesti);
+
+                    int progres = temporitzarLlansament.estaDins(cantoDretaDalt,cantoEsquerreBaix,llistaMesAlts.get(puntMesAltTotal));
+
+                    if(progres>0) {
+                        if (progres > 10) {
+                            latitut = mlocListener.latitud;
+                            longitud = mlocListener.longitud;
+                            angle = brujula.getAngle();
+                            //Laboratori
+                            //latitut = 39.070622;
+                            //longitud = -0.269588;
+                            //angle = 177.5;//moduver desde laboratori
+                            //Casa
+                            //latitut = 39.068727;
+                            //longitud = -0.291360;
+                            //angle = 162;//moduver desde casa
+                            //angle = 179;//penyalba
+                            //angle=50;//Creus
+                            distancia = 30;
+                            latitudDesti = getLatDesti(latitut, angle, distancia);
+                            longitudDesti = getLongDesti(longitud, latitut, angle, distancia);
+                            TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
+                            llistaPuntsRetornada.clear();
+                            tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
+                            tareaRecollirAltimetria.execute(latitut, longitud, latitudDesti, longitudDesti);
+                        }
                     }
 
                 }
@@ -647,7 +658,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
     }
 
-    public class TareaRecollirAltimetria extends AsyncTask<Double,Double,ArrayList<Punt>> {
+    public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<Punt>> {
         private final String LOG_TAG = TareaRecollirAltimetria.class.getSimpleName();
         private ArrayList<Punt> llistaPunts = new ArrayList<>();
 
@@ -757,10 +768,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             //Punt puntMesAlt = llistaPunts.getPuntMesAlt();
             Punt puntMesAltVisible = llistaPunts.getPuntMesAltVisible();
             TextView text = (TextView) findViewById(R.id.txtAltura);
-
+            TextView textNomPic = (TextView) findViewById(R.id.txtNomPic);
             text.setText(Math.round(puntMesAltVisible.getAltura())+"m");
+            QueryNom queryNom = new QueryNom();
+            queryNom.setVista(textNomPic);
+            queryNom.execute(puntMesAltVisible.getLongitudUTM()+"",puntMesAltVisible.getLatitudUTM()+"",puntMesAltVisible.getHuso()+"");
             Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
         }
+
 
         private ArrayList<Punt> getDades(String resposta) throws JSONException{
             //ArrayList<Punt> llistaPunts = new ArrayList<>();
