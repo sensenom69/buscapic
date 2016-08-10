@@ -49,9 +49,6 @@ public class Punt {
         BigDecimal e3= e1.subtract(e2);
         BigDecimal e4= a.subtract(b);
 
-
-        double excentricidad=Math.sqrt(e3.doubleValue())/a.doubleValue();
-        double excentricidad2=Math.sqrt(e3.doubleValue())/b.doubleValue();
         double exp=Math.pow(Math.sqrt(e3.doubleValue())/b.doubleValue(),2);
         double c=Math.pow(a.doubleValue(),2)/b.doubleValue();
 
@@ -83,7 +80,7 @@ public class Punt {
         double gamma=(1.2962962)*Math.pow(alfa,3);
         double bfi=0.9996*c*(latitudRadianes-(alfa*j2)+(beta*j4)-(gamma*j6));
 
-        longitudUTM=(xi*ni*(1+zeta/3)*1.003+500000);
-        latitudUTM=(eta*ni*1.0009*(1+zeta)+bfi);
+        longitudUTM=(xi*ni*(1+zeta/3)*1.003+500000);//el 1.003 es per a ajustar el UTM
+        latitudUTM=(eta*ni*1.0009*(1+zeta)+bfi);//el 1.0009 es per ajustar el UTM
     }
 }
