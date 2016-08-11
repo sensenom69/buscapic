@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -51,7 +50,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     //Per al gps i el temporitzador
-    MyLocationListener mlocListener;
+    Localitzador mlocListener;
     //El temporitzador
     private TemporitzarLlansament temporitzarLlansament =  new TemporitzarLlansament();
     ProgressBar progressBar;
@@ -156,7 +155,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mOpenCvCameraView.setMaxFrameSize(600, 650);
 
         LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mlocListener = new MyLocationListener();
+        mlocListener = new Localitzador();
+        TextView textView = (TextView) findViewById(R.id.textCoordenades);
+        textView.setText("Esperant GPS");
+        mlocListener.setVistes(textView);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -168,8 +170,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             return;
         }
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) mlocListener);
-        TextView textView = (TextView) findViewById(R.id.view_text);
-        textView.setText("Esperant GPS");
+
         //imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
 
         //bruixola
@@ -185,16 +186,16 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             @Override
             public void onClick(View view){
 
-                latitut = mlocListener.latitud;
-                longitud = mlocListener.longitud;
+                latitut = mlocListener.getLatitud();
+                longitud = mlocListener.getLongitud();
                 angle = brujula.getAngle();
                 //Laboratori
                 //latitut = 39.070622;
                 //longitud = -0.269588;
                 //angle = 177.5;//moduver desde laboratori
                 //Casa
-                latitut = 39.068727;
-                longitud = -0.291360;
+                //latitut = 39.068727;
+                //longitud = -0.291360;
                 //angle = 162;//moduver desde casa
                 //angle = 179;//penyalba
                 //angle=50;//Creus
@@ -325,8 +326,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
                     if(progres>0) {
                         if (progres > 10) {
-                            latitut = mlocListener.latitud;
-                            longitud = mlocListener.longitud;
+                            latitut = mlocListener.getLatitud();
+                            longitud = mlocListener.getLongitud();
                             angle = brujula.getAngle();
                             //Laboratori
                             //latitut = 39.070622;
@@ -445,6 +446,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         return longitud;
     }
 
+    /*
     public class MyLocationListener implements LocationListener {
         public double latitud = 0;
         public double longitud = 0;
@@ -498,6 +500,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
 
     }
+    */
 
 }
 

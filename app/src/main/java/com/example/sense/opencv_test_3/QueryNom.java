@@ -85,9 +85,14 @@ public class QueryNom extends AsyncTask<String, Void,String> {
                 return null;
             }
             resposta = buffer.toString();
-            resposta = resposta.substring(resposta.indexOf("filaNormal"),resposta.indexOf("<!-- fin -->"));
-            resposta = resposta.substring(resposta.indexOf("_blank\">")+"_blank\">".length(),resposta.indexOf("</a>"));
+            try {
+                resposta = resposta.substring(resposta.indexOf("filaNormal"), resposta.indexOf("<!-- fin -->"));
+                resposta = resposta.substring(resposta.indexOf("_blank\">") + "_blank\">".length(), resposta.indexOf("</a>"));
+            }catch(Exception e){
+                resposta = "";
+            }
             Log.v(LOG_TAG, "Resposta string: " + resposta);
+
         }catch (Exception e){
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping

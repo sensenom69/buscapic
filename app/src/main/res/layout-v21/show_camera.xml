@@ -22,7 +22,7 @@
         android:src="@android:drawable/ic_dialog_map" />
 
     <TextView
-        android:id="@+id/view_text"
+        android:id="@+id/textCoordenades"
         android:layout_width="158dp"
         android:layout_height="66dp"
         android:text="Hello World!"
