@@ -3,8 +3,6 @@ package com.example.sense.opencv_test_3;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -21,8 +19,6 @@ import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -50,6 +46,8 @@ import java.util.List;
 
 //TODO: fer un progressBar
 //TODO: llevar el show_Camera de la v21
+//TODO: llevaqr el cartell del nom quan es llansa una nova query
+//TODO: quan  es fa una query de nom , preparar el que no existixca el nom
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
     //Per al gps i el temporitzador
@@ -75,11 +73,11 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private ArrayList<Punt> llistaPuntsRetornada = new ArrayList<>();
     //La brujula
     private SensorManager sensorManager;
-    private MyBrujula brujula;
+    private Brujula brujula;
 
 
     // Views donde se cargaran los elementos del XML
-    private TextView txtAngle;
+
     private ImageView imgCompass;
     ////Fins aci la brujula
     // Used for logging success or failure messages
@@ -144,17 +142,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
 
-        //Temporitzador
-
-
-
-        //bruixola
-        brujula = new MyBrujula();
-        brujula.llansa();
-        sensorManager = brujula.getmSensorManager();
-        //////
-
-
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -184,7 +171,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         TextView textView = (TextView) findViewById(R.id.view_text);
         textView.setText("Esperant GPS");
         //imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
-        txtAngle = (TextView) findViewById(R.id.txtAngle);
+
+        //bruixola
+        brujula = new Brujula();
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        TextView textAngle = (TextView)findViewById(R.id.txtAngle);
+        brujula.llansa(sensorManager,textAngle);
+
+
         //El boto flotant
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -203,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 longitud = -0.291360;
                 //angle = 162;//moduver desde casa
                 //angle = 179;//penyalba
-                angle=50;//Creus
+                //angle=50;//Creus
                 distancia = 30;
                 latitudDesti = getLatDesti(latitut,angle,distancia);
                 longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
@@ -233,9 +227,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         super.onResume();
 
         // Se registra un listener para los sensores del accelerometer y el             magnetometer
-        sensorManager.registerListener(brujula,brujula.rotationmeter,SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(brujula, brujula.accelerometer, SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(brujula, brujula.magnetometer, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(brujula,brujula.getRotationmeter(),SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(brujula, brujula.getAccelerometer(), SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(brujula, brujula.getMagnetometer(), SensorManager.SENSOR_DELAY_UI);
 
         //esta part es de la vista
         if (!OpenCVLoader.initDebug()) {
@@ -373,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
                 Core.transpose(mRgba, mRgbaT);
                 Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
+
                 Core.flip(mRgbaF, mRgba, 0);
 
 
@@ -503,151 +498,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
 
     }
-
-    public class MyBrujula implements SensorEventListener{
-
-
-        // guarda el angulo (grado) actual del compass
-        private float currentDegree = 0f;
-
-        // El sensor manager del dispositivo
-        private SensorManager mSensorManager;
-        // Los dos sensores que son necesarios porque TYPE_ORINETATION esta deprecated
-        private Sensor accelerometer;
-        private Sensor magnetometer;
-        private Sensor rotationmeter;
-
-        // Los angulos del movimiento de la flecha que señala al norte
-        float degree;
-        // Guarda el valor del azimut
-        float azimut;
-        // Guarda los valores que cambián con las variaciones del sensor TYPE_ACCELEROMETER
-        float[] mGravity;
-        // Guarda los valores que cambián con las variaciones del sensor TYPE_MAGNETIC_FIELD
-        float[] mGeomagnetic;
-        //proves
-        float[] rotationVector;
-        float pich;
-        float avgRead[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-
-        public void llansa(){
-            // Se inicializa los sensores del dispositivo android
-            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-            rotationmeter = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-            accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-            mGravity = null;
-            mGeomagnetic = null;
-            rotationVector = null;
-        }
-
-        public SensorManager getmSensorManager(){
-            return mSensorManager;
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-
-            // Se comprueba que tipo de sensor está activo en cada momento
-            if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-                    mGravity = lowPass( event.values.clone(), mGravity );
-            if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-                    mGeomagnetic = lowPass( event.values.clone(), mGeomagnetic );
-            if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR)
-                rotationVector = event.values.clone();
-
-
-
-            if ((mGravity != null) && (mGeomagnetic != null)) {
-                float rotationV[] = new float[16];
-                float RI[] = new float[9];
-                float I[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(RI, I, mGravity, mGeomagnetic);
-
-                if (success) {
-                    float orientation[] = new float[3];
-                    //SensorManager.getOrientation(RI, orientation);
-                    float[] outR = new float[9];
-                    SensorManager.remapCoordinateSystem(RI, SensorManager.AXIS_X,SensorManager.AXIS_Z, outR);
-                    SensorManager.getOrientation(outR, orientation);
-
-                    azimut = orientation[0] * (180 / (float) Math.PI);
-                    pich = orientation[1] * 180/ (float) Math.PI;
-                    //azimut = (float) Math.toDegrees(orientation[0]);
-
-                    avgRead[0] = avgRead[1];
-                    avgRead[1] = avgRead[2];
-                    avgRead[2] = avgRead[3];
-                    avgRead[3] = avgRead[4];
-                    avgRead[4] = avgRead[5];
-                    avgRead[5] = avgRead[6];
-                    avgRead[6] = avgRead[7];
-                    avgRead[7] = avgRead[8];
-                    avgRead[8] = orientation[0]; // orientation contains: azimuth, pitch and roll
-                    azimut = (avgRead[0] + avgRead[1] + avgRead[2] + avgRead[3]
-                            + avgRead[4] + avgRead[5] + avgRead[6] + avgRead[7] + avgRead[8]) / 9;
-
-
-                    azimut = azimut * 360 / (2 * 3.14159f);
-                    if (azimut < 0 && azimut > -180)
-                        azimut += 360;
-
-                }
-                txtAngle.setText("Angle: " + azimut);
-
-            }
-
-            degree = azimut;
-
-            // se crea la animacion de la rottacion (se revierte el giro en grados, negativo)
-
-            RotateAnimation ra = new RotateAnimation(
-                    currentDegree,
-                    degree,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF,
-                    0.5f);
-            // el tiempo durante el cual la animación se llevará a cabo
-            ra.setDuration(1000);
-            // establecer la animación después del final de la estado de reserva
-            ra.setFillAfter(true);
-            // Inicio de la animacion
-            //imgCompass.startAnimation(ra);
-            currentDegree = -degree;
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-
-        public double getAngle(){
-            return degree;
-        }
-
-        /*
-        * time smoothing constant for low-pass filter
-        * 0 ≤ alpha ≤ 1 ; a smaller value basically means more smoothing
-        * See: http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
-        */
-        static final float ALPHA = 0.1f;
-
-        /**
-         * @see ://en.wikipedia.org/wiki/Low-pass_filter#Algorithmic_implementation
-         * @see ://developer.android.com/reference/android/hardware/SensorEvent.html#values
-         */
-        protected float[] lowPass( float[] input, float[] output ) {
-            if ( output == null ) return input;
-
-            for ( int i=0; i<input.length; i++ ) {
-                output[i] = output[i] + ALPHA * (input[i] - output[i]);
-            }
-            return output;
-        }
-    }
-
 
 }
 
