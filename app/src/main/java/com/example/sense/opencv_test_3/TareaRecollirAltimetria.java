@@ -133,19 +133,17 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
         super.onPostExecute(result);
 
         LlistaPunts llistaPuntsIntern = new LlistaPunts(llistaPunts);
-        //llistaPunts.calculaPuntMesAlt();
-        //Punt puntMesAlt = llistaPunts.getPuntMesAlt();
         Punt puntMesAltVisible = llistaPuntsIntern.getPuntMesAltVisible();
-        textViewAltura.setText(Math.round(puntMesAltVisible.getAltura())+"m");
-        QueryNom queryNom = new QueryNom();
-        queryNom.setVista(textViewNom);
-        queryNom.execute(puntMesAltVisible.getLongitudUTM()+"",puntMesAltVisible.getLatitudUTM()+"",puntMesAltVisible.getHuso()+"");
-        //Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
+        if(puntMesAltVisible != null) {
+            textViewAltura.setText(Math.round(puntMesAltVisible.getAltura()) + "m");
+            QueryNom queryNom = new QueryNom();
+            queryNom.setVista(textViewNom);
+            queryNom.execute(puntMesAltVisible.getLongitudUTM() + "", puntMesAltVisible.getLatitudUTM() + "", puntMesAltVisible.getHuso() + "");
+        }
     }
 
 
     private ArrayList<Punt> getDades(String resposta) throws JSONException{
-        //ArrayList<Punt> llistaPunts = new ArrayList<>();
         JSONObject alturesJson = new JSONObject(resposta);
         JSONArray alturesArray = alturesJson.getJSONArray("results");
 

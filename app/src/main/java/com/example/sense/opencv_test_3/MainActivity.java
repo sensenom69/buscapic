@@ -1,64 +1,29 @@
 package com.example.sense.opencv_test_3;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.android.JavaCameraView;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
-import java.util.List;
 
 //TODO: fer un progressBar
 //TODO: llevar el show_Camera de la v21
 //TODO: llevaqr el cartell del nom quan es llansa una nova query
 //TODO: quan  es fa una query de nom , preparar el que no existixca el nom
+//TODO: manejar el error quan no pilla conexio internet o falla la pagina de google
 
-public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
+public class MainActivity extends AppCompatActivity {
     //Per al gps i el temporitzador
     Localitzador mlocListener;
     //El temporitzador
     private TemporitzarLlansament temporitzarLlansament =  new TemporitzarLlansament();
-    ProgressBar progressBar;
     //En la RA el punt mes alt dins la visió.
-    private Point puntMesAlt = new Point(0,0);
-    //En la RA el recuadre que dellimita el pic
-    private Point cantoDretaDalt;
-    private Point cantoEsquerreBaix;
+    //private Point puntMesAlt = new Point(0,0);
+
 
     //Les dades per a tirar la linea
     private double latitut;
@@ -68,16 +33,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private double latitudDesti;
     private double longitudDesti;
     private double distancia;
-    private double altitud;
+    //private double altitud;
     private ArrayList<Punt> llistaPuntsRetornada = new ArrayList<>();
     //La brujula
     private SensorManager sensorManager;
     private Brujula brujula;
 
 
+
     // Views donde se cargaran los elementos del XML
 
-    private ImageView imgCompass;
+   // private ImageView imgCompass;
     ////Fins aci la brujula
     // Used for logging success or failure messages
     private static final String TAG = "OCVSample::Activity";
@@ -85,47 +51,22 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
     private CameraBridgeViewBase mOpenCvCameraView;
 
-    // Used in Camera selection from menu (when implemented)
-    private boolean mIsJavaCamera = true;
-    private MenuItem mItemSwitchCamera = null;
 
-    // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
-    Mat mRgba;
-    Mat mRgbaF;
-    Mat mRgbaT;
-    Mat mIntermediateMat;
-
-
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        //Now, lets call OpenCV manager to help our app communicate with android phone to make OpenCV work
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS: {
-                    Log.i(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();//This variable acts as a bridge between camera and OpenCV library.
-                }
-                break;
-                default: {
-                    super.onManagerConnected(status);
-                }
-                break;
-            }
-        }
-    };//Well, once OpenCV library is loaded, you may want to perform some actions. For example, displaying a success or failure message.
-
+    /*
     public void MainActivity_show_camera() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
-
+    */
     @Override
-    /*
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.show_camera);
 
+       CamaraFragment camaraFragment = (CamaraFragment)getSupportFragmentManager().findFragmentById(R.id.CamaraFragment) ;
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,270 +75,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                         .setAction("Action", null).show();
             }
         });
-    }
-    */
-    //Now, when the activity is created, display the OpenCV camera in the layout. show_camera.xml.
-    protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
-        super.onCreate(savedInstanceState);
-
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.show_camera);
-
-        mOpenCvCameraView = (JavaCameraView) findViewById(R.id.show_camera_activity_java_surface_view);
-
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-
-        mOpenCvCameraView.setCvCameraViewListener(this);
-
-        mOpenCvCameraView.setMaxFrameSize(600, 650);
-
-        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mlocListener = new Localitzador();
-        TextView textView = (TextView) findViewById(R.id.textCoordenades);
-        textView.setText("Esperant GPS");
-        mlocListener.setVistes(textView);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) mlocListener);
-
-        //imgCompass = (ImageView) findViewById(R.id.imgViewCompass);
-
-        //bruixola
-        brujula = new Brujula();
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        TextView textAngle = (TextView)findViewById(R.id.txtAngle);
-        brujula.llansa(sensorManager,textAngle);
-
-
-        //El boto flotant
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-
-                latitut = mlocListener.getLatitud();
-                longitud = mlocListener.getLongitud();
-                angle = brujula.getAngle();
-                //Laboratori
-                //latitut = 39.070622;
-                //longitud = -0.269588;
-                //angle = 177.5;//moduver desde laboratori
-                //Casa
-                //latitut = 39.068727;
-                //longitud = -0.291360;
-                //angle = 162;//moduver desde casa
-                //angle = 179;//penyalba
-                //angle=50;//Creus
-                distancia = 30;
-                latitudDesti = getLatDesti(latitut,angle,distancia);
-                longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
-                TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
-                llistaPuntsRetornada.clear();
-                tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
-                tareaRecollirAltimetria.setVistes((TextView)findViewById(R.id.txtAltura),(TextView)findViewById(R.id.txtNomPic));
-                tareaRecollirAltimetria.execute(latitut,longitud,latitudDesti,longitudDesti);
-                Toast.makeText(getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();
-
-            }
-        });
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        sensorManager.unregisterListener((SensorEventListener) brujula);
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        // Se registra un listener para los sensores del accelerometer y el             magnetometer
-        sensorManager.registerListener(brujula,brujula.getRotationmeter(),SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(brujula, brujula.getAccelerometer(), SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener(brujula, brujula.getMagnetometer(), SensorManager.SENSOR_DELAY_UI);
-
-        //esta part es de la vista
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
-        } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
-
-    //Receive Image Data when the camera preview starts on your screen
-    public void onCameraViewStarted(int width, int height) {
-
-        //mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mRgbaF = new Mat(height, width, CvType.CV_8UC4);
-        mRgbaT = new Mat(width, width, CvType.CV_8UC4);
-        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
-    }
-
-    //Destroy image data when you stop camera preview on your phone screen
-    public void onCameraViewStopped() {
-        mRgba.release();
-    }
-
-    //Now, this one is interesting! OpenCV orients the camera to left by 90 degrees.
-    // So if the app is in portrait more, camera will be in -90 or 270 degrees orientation.
-    // We fix that in the next and the most important function. There you go!
-    public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-
-        mRgba = inputFrame.rgba();
-        Size sizeRgba = mRgba.size();
-        Mat rgbaInnerWindow;
-
-        int rows = (int) sizeRgba.height;
-        int cols = (int) sizeRgba.width;
-
-        int left = 0;
-        int top = (rows/4)+25;
-
-        int width = cols * 3 / 8;
-        int height = rows * 3 / 7;
-
-        switch (mOpenCvCameraView.getDisplay().getRotation()) {
-            case Surface.ROTATION_0: // Vertical portrait
-                /*
-                Core.transpose(mRgba, mRgbaT);
-                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
-                Core.flip(mRgbaF, mRgba, 1);
-                */
-                rgbaInnerWindow = mRgba.submat(top, top + height, left, left + width);
-                Mat imageBlurr = mRgba.submat(top, top + height, left, left + width);
-
-                //cantoDretaDalt = new Point(70,height/2.5);
-                //cantoEsquerreBaix =  new Point(width-20,height-110);
-                cantoDretaDalt = new Point(70,height/2.6);
-                cantoEsquerreBaix =  new Point(width-20,height-110);
-
-
-                Imgproc.GaussianBlur(rgbaInnerWindow, imageBlurr, new Size(5,5), 45);
-                Mat grayscaledMat = new Mat();
-                Imgproc.cvtColor(rgbaInnerWindow, grayscaledMat, Imgproc.COLOR_BGR2GRAY, 4);
-                Mat cannyOut = new Mat();
-                Imgproc.Canny(grayscaledMat, cannyOut, 5, 25);
-                List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-                Imgproc.findContours(cannyOut, contours, new Mat(), Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_NONE );
-                List<Point> llistaMesAlts = new ArrayList<>();
-                for(int i=0; i< contours.size();i++){
-                    System.out.println(Imgproc.contourArea(contours.get(i)));
-                    if (Imgproc.contourArea(contours.get(i)) > 0 ){
-                        List<Point> listaPuntos = new ArrayList<Point>();
-                        Converters.Mat_to_vector_Point(contours.get(i),listaPuntos);
-                        int puntMesAlt = getPuntMesAlt(listaPuntos);
-                        llistaMesAlts.add(listaPuntos.get(puntMesAlt));
-                        Imgproc.rectangle(rgbaInnerWindow,new Point(listaPuntos.get(puntMesAlt).x+5,listaPuntos.get(puntMesAlt).y+5),new Point(listaPuntos.get(puntMesAlt).x,listaPuntos.get(puntMesAlt).y), new Scalar(255,0,0));
-                    }
-                }
-
-                if(llistaMesAlts.size()>0) {
-                    int puntMesAltTotal = getPuntMesAlt(llistaMesAlts);
-                    puntMesAlt = llistaMesAlts.get(puntMesAltTotal);
-                    Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
-                    //if(temporitzarLlansament.voltesPasades(cantoDretaDalt,cantoEsquerreBaix,new Point(80,120)))
-
-                    int progres = temporitzarLlansament.estaDins(cantoDretaDalt,cantoEsquerreBaix,llistaMesAlts.get(puntMesAltTotal));
-
-                    if(progres>0) {
-                        if (progres > 10) {
-                            latitut = mlocListener.getLatitud();
-                            longitud = mlocListener.getLongitud();
-                            angle = brujula.getAngle();
-                            //Laboratori
-                            //latitut = 39.070622;
-                            //longitud = -0.269588;
-                            //angle = 177.5;//moduver desde laboratori
-                            //Casa
-                            //latitut = 39.068727;
-                            //longitud = -0.291360;
-                            //angle = 162;//moduver desde casa
-                            //angle = 179;//penyalba
-                            //angle=50;//Creus
-                            distancia = 30;
-                            latitudDesti = getLatDesti(latitut, angle, distancia);
-                            longitudDesti = getLongDesti(longitud, latitut, angle, distancia);
-                            TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
-                            llistaPuntsRetornada.clear();
-                            tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
-                            tareaRecollirAltimetria.execute(latitut, longitud, latitudDesti, longitudDesti);
-                        }
-                    }
-
-                }
-
-                Imgproc.rectangle(rgbaInnerWindow, cantoEsquerreBaix,cantoDretaDalt, new Scalar(255,0,0));
-
-
-                Core.transpose(mRgba, mRgbaT);
-                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
-
-                Core.flip(mRgbaF, mRgba, 1);
-                imageBlurr.release();
-                break;
-            case Surface.ROTATION_90: // 90° anti-clockwise
-
-
-                break;
-            case Surface.ROTATION_180: // Vertical anti-portrait
-
-                Core.transpose(mRgba, mRgbaT);
-                Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
-
-                Core.flip(mRgbaF, mRgba, 0);
-
-
-                break;
-            case Surface.ROTATION_270: // 90° clockwise
-
-                Imgproc.resize(mRgba, mRgbaF, mRgbaF.size(), 0,0, 0);
-                Core.flip(mRgbaF, mRgba, -1);
-
-
-                break;
-            default:
-        }
-        return mRgba;
+        */
     }
 
 
 
-    public int getPuntMesAlt(List<Point> llistaPunts){
-        int primerPunt = 0;
-        double auxY=100000;
-        for(int i=0;i<llistaPunts.size();i++){
-            if(llistaPunts.get(i).x < auxY){
-                auxY = llistaPunts.get(i).x;
-                primerPunt = i;
-            }
-        }
-        return primerPunt;
-    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -420,87 +104,6 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         return super.onOptionsItemSelected(item);
     }
-
-    public double getLatDesti(double lat, double graus, double distancia){
-
-        double latitudRadi =Math.toRadians(lat);
-        double grausRadians = Math.toRadians(graus);
-        int radiTerra = 6371;
-
-        return  Math.toDegrees(Math.asin(Math.sin(latitudRadi)*Math.cos(distancia/radiTerra) + Math.cos(latitudRadi)*Math.sin(distancia/radiTerra)*Math.cos(grausRadians)));
-
-    }
-
-    public double getLongDesti(double longi, double lat, double graus, double distancia){
-        /*
-        double longitudRadi =longi;
-        double grausRadians = graus;
-        double coseno = Math.cos(grausRadians);
-        double dist = (360*distancia)/(2*3.141516*6371000);
-        double resultatEnGrau = longitudRadi + coseno * dist;
-        */
-        int radiTerra = 6371;
-        double lati =  getLatDesti(lat,graus,distancia);
-        double longitud =Math.toRadians(longi) + Math.atan2(Math.sin(Math.toRadians(angle))*Math.sin(distancia/radiTerra)*Math.cos(Math.toRadians(lat)), Math.cos(distancia/radiTerra)-Math.sin(Math.toRadians(lat))*Math.sin(Math.toRadians(lati)));
-        longitud = (Math.toDegrees(longitud)+540)%360-180;
-        return longitud;
-    }
-
-    /*
-    public class MyLocationListener implements LocationListener {
-        public double latitud = 0;
-        public double longitud = 0;
-        public double bearing = 0;
-
-        @Override
-        public void onLocationChanged(Location loc) {
-
-            // Este mŽtodo se ejecuta cada vez que el GPS recibe nuevas coordenadas
-            // debido a la detecci—n de un cambio de ubicacion
-
-            latitud = loc.getLatitude();
-            longitud = loc.getLongitude();
-            altitud = loc.getAltitude();
-            String Text = "Mi ubicaci—n actual es: " + "\n Lat = "
-                    + loc.getLatitude() + "\n Long = " + loc.getLongitude()+""
-                    +"\n bearing = "+loc.getBearing();
-            TextView text = (TextView) findViewById(R.id.view_text);
-            text.setText(Text);
-
-            Toast.makeText(getApplicationContext(),Text,Toast.LENGTH_LONG);
-
-        }
-
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            // Este mŽtodo se ejecuta cuando el GPS es desactivado
-            TextView text = (TextView) findViewById(R.id.view_text);
-            text.setText("GPS Desactivado");
-            Toast.makeText(getApplicationContext(),"GPS Desactivado",Toast.LENGTH_LONG);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            // Este mŽtodo se ejecuta cuando el GPS es activado
-            TextView text = (TextView) findViewById(R.id.view_text);
-            text.setText("GPS Activado");
-            Toast.makeText(getApplicationContext(),"GPS Activado",Toast.LENGTH_LONG);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // Este mŽtodo se ejecuta cada vez que se detecta un cambio en el
-            // status del proveedor de localizaci—n (GPS)
-            // Los diferentes Status son:
-            // OUT_OF_SERVICE -> Si el proveedor esta fuera de servicio
-            // TEMPORARILY_UNAVAILABLE -> Temp˜ralmente no disponible pero se
-            // espera que este disponible en breve
-            // AVAILABLE -> Disponible
-        }
-
-    }
-    */
 
 }
 

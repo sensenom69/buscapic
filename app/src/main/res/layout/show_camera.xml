@@ -5,53 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.opencv.android.JavaCameraView
+    <fragment
+        class="com.example.sense.opencv_test_3.CamaraFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        android:id="@+id/show_camera_activity_java_surface_view"
-        opencv:camera_id="any"
-        android:layout_gravity="top" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_map" />
-
-    <TextView
-        android:id="@+id/view_text"
-        android:layout_width="158dp"
-        android:layout_height="66dp"
-        android:text="Hello World!"
-        android:background="#9b0101"
-        android:textColor="#fffefe"
-        android:layout_gravity="left|bottom" />
-
-    <TextView
-        android:id="@+id/txtAngle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="20dp"
-        android:text="Heading: 0.0"
-        android:layout_gravity="center_horizontal|bottom"
-        android:textColor="#fcfbfb" />
-
-
-    <TextView
-        android:id="@+id/txtAltura"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
-        android:text=""
-        android:layout_gravity="center_horizontal"
-        android:textColor="#fcfbfb"
-        android:background="@android:color/holo_blue_light"/>
-
+        android:id="@+id/CamaraFragment"
+        android:layout_gravity="top"/>
 
 </FrameLayout>
