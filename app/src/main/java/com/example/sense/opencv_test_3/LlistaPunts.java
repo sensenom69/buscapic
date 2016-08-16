@@ -72,8 +72,9 @@ public class LlistaPunts {
     public int calculaPuntMesAltVisible(int pos){
         double angle =  getAngleVisio(llistaPunts.get(0),llistaPunts.get(pos));
         double alturaPuntOrige = llistaPunts.get(0).getAltura()+1.7;
+        double distancia = 0;
         for(int i= pos-1; i > 0 ;i--){
-            double distancia = getDistanciaPunt(llistaPunts.get(0),llistaPunts.get(i));
+            distancia = getDistanciaPunt(llistaPunts.get(0),llistaPunts.get(i));
             double alturaVisual = distancia*(1/Math.tan(Math.toRadians(90-angle)))+alturaPuntOrige;
             double alturaPunt = llistaPunts.get(i).getAltura();
             if(alturaPunt > alturaVisual){
@@ -81,6 +82,7 @@ public class LlistaPunts {
                 return pos;
             }
         }
+        llistaPunts.get(pos).setDistancia(distancia);
         return pos;
     }
 
@@ -94,4 +96,5 @@ public class LlistaPunts {
     public Punt getPuntMesAltVisible(){
         return llistaPunts.get(getPosPuntMesAltVisible());
     }
+
 }

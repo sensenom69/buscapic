@@ -9,6 +9,7 @@ public class Punt {
     private double latitud;
     private double longitud;
     private double altura;
+    private double distancia;
     private double latitudUTM;
     private double longitudUTM;
     private int huso;
@@ -38,6 +39,10 @@ public class Punt {
     public double getAltura(){
         return altura;
     }
+
+    public double getDistancia(){return distancia;}
+
+    public void setDistancia(double distancia){this.distancia = distancia;}
 
     public void transformaUTM(){
 

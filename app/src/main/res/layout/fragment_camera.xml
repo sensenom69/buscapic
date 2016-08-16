@@ -3,15 +3,54 @@
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#b63636">
 
     <org.opencv.android.JavaCameraView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="-105dp"
         android:visibility="gone"
         android:id="@+id/show_camera_activity_java_surface_view"
         opencv:camera_id="any"
         android:layout_gravity="top" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="134dp"
+        android:background="@color/colorPrimary"
+        android:layout_gravity="left|bottom"
+        android:textAlignment="center">
+
+        <TextView
+            android:id="@+id/textCoordenades"
+            android:layout_width="158dp"
+            android:layout_height="66dp"
+            android:text="Hello World!"
+            android:background="#9b0101"
+            android:textColor="#ffffff"
+            android:layout_gravity="left|bottom" />
+
+        <TextView
+            android:id="@+id/txtAngle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="20dp"
+            android:text="Heading: 0.0"
+            android:layout_gravity="left|top"
+            android:textColor="#fcfbfb" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distancia"
+            android:id="@+id/textDistancia"
+            android:textColor="#ffffff"
+            android:layout_gravity="right|center_horizontal"
+            android:layout_marginTop="30dp" />
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -20,26 +59,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_dialog_map" />
-
-    <TextView
-        android:id="@+id/textCoordenades"
-        android:layout_width="158dp"
-        android:layout_height="66dp"
-        android:text="Hello World!"
-        android:background="#9b0101"
-        android:textColor="#fffefe"
-        android:layout_gravity="left|bottom" />
-
-    <TextView
-        android:id="@+id/txtAngle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="20dp"
-        android:text="Heading: 0.0"
-        android:layout_gravity="center_horizontal|bottom"
-        android:textColor="#fcfbfb" />
 
 
     <TextView
@@ -62,4 +81,5 @@
         android:layout_gravity="center_horizontal"
         android:textColor="#fcfbfb"
         android:background="@android:color/holo_blue_light"/>
+
 </FrameLayout>
