@@ -191,6 +191,7 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
                     TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
                     llistaPuntsRetornada.clear();
                     tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
+                    tareaRecollirAltimetria.setContext(getActivity());
                     tareaRecollirAltimetria.setVistes((TextView) getActivity().findViewById(R.id.txtAltura),(TextView) getActivity().findViewById(R.id.txtNomPic));
                     tareaRecollirAltimetria.execute(latitut,longitud,latitudDesti,longitudDesti);
                     Toast.makeText(getActivity().getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();

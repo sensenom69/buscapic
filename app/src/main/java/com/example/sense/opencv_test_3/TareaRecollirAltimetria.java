@@ -1,5 +1,6 @@
 package com.example.sense.opencv_test_3;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,16 +24,22 @@ import java.util.ArrayList;
 public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<Punt>> {
     private final String LOG_TAG = TareaRecollirAltimetria.class.getSimpleName();
     private ArrayList<Punt> llistaPunts = new ArrayList<>();
-    private TextView textViewAltura;
+    //private TextView textViewAltura;
     private TextView textViewNom;
+    private int NUM_MIDES = 500;
+    private Activity activity;
 
     public void setLlistaPunts(ArrayList<Punt> llistaPunts){
         this.llistaPunts.clear();
         this.llistaPunts = llistaPunts;
     }
 
+    public void setContext(Activity activity){
+        this.activity = activity;
+    }
+
     public void setVistes(TextView textViewAltura, TextView textViewNom){
-        this.textViewAltura = textViewAltura;
+        //this.textViewAltura = textViewAltura;
         this.textViewNom = textViewNom;
     }
     @Override
@@ -50,8 +57,6 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
         // La resposta anira aci
         String respostaJsonStr = null;
 
-        int numMides = 400;
-
         try {
             // Construim la URI per a la demanda de altimetria
 
@@ -64,7 +69,7 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
 
             Uri builtUri = Uri.parse(QUERY_BASE_URL).buildUpon()
                     .appendQueryParameter(QUERY_PARAM, Double.toString(params[0])+","+Double.toString(params[1])+"|"+Double.toString(params[2])+","+Double.toString(params[3]))
-                    .appendQueryParameter(SAMPLES_PARAM, Integer.toString(numMides))
+                    .appendQueryParameter(SAMPLES_PARAM, Integer.toString(NUM_MIDES))
                     .appendQueryParameter(KEY_PARAM, "AIzaSyDMbRA1zZeqZav72o3KINxncj3A8xEb3F8")
                     .build();
 
@@ -134,8 +139,15 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
 
         LlistaPunts llistaPuntsIntern = new LlistaPunts(llistaPunts);
         Punt puntMesAltVisible = llistaPuntsIntern.getPuntMesAltVisible();
+        int posPuntMesAlt = llistaPuntsIntern.getPosPuntMesAltVisible();
+        Double distanciaPeu = llistaPuntsIntern.getDistanciaPeu(NUM_MIDES,30000);
         if(puntMesAltVisible != null) {
+            TextView textViewAltura = (TextView) activity.findViewById(R.id.txtAltura);
             textViewAltura.setText(Math.round(puntMesAltVisible.getAltura()) + "m");
+            TextView textDistanciaPeu = (TextView) activity.findViewById(R.id.textDistanciaPeu);
+            textDistanciaPeu.setText(Math.round(distanciaPeu*10)/10 + "m");
+            TextView textDistancia = (TextView) activity.findViewById(R.id.textDistancia);
+            textDistancia.setText((30000/NUM_MIDES)*posPuntMesAlt + "mo");
             QueryNom queryNom = new QueryNom();
             queryNom.setVista(textViewNom);
             queryNom.execute(puntMesAltVisible.getLongitudUTM() + "", puntMesAltVisible.getLatitudUTM() + "", puntMesAltVisible.getHuso() + "");

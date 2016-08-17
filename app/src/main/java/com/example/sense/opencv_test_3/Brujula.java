@@ -115,7 +115,7 @@ public class Brujula implements SensorEventListener {
 
 
         }
-        textAngle.setText("Angle: " + azimut);
+        textAngle.setText("Angle: " + Math.round(azimut));
         degree = azimut;
 
         // se crea la animacion de la rottacion (se revierte el giro en grados, negativo)

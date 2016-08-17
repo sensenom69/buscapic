@@ -97,4 +97,13 @@ public class LlistaPunts {
         return llistaPunts.get(getPosPuntMesAltVisible());
     }
 
+    public double getDistanciaPeu(double mostres, double fiMida){
+        double distanciaPeu = 0;
+        double distanciaPunts = fiMida/mostres;
+        for(int i=0; i<posPuntMesAltVisible;i++){
+            distanciaPeu += Math.sqrt(Math.pow(Math.abs(llistaPunts.get(i).getAltura()-llistaPunts.get(i+1).getAltura()),2)+Math.pow(distanciaPunts,2));
+        }
+        return distanciaPeu;
+    }
+
 }

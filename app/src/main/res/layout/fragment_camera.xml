@@ -45,20 +45,30 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distancia"
-            android:id="@+id/textDistancia"
+            android:text="Distancia peus"
+            android:id="@+id/textDistanciaPeu"
             android:textColor="#ffffff"
             android:layout_gravity="right|center_horizontal"
             android:layout_marginTop="30dp" />
-    </FrameLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_map" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distancia"
+            android:id="@+id/textDistancia"
+            android:textColor="#ffffff"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginTop="30dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/ic_dialog_map" />
+
+    </FrameLayout>
 
 
     <TextView
