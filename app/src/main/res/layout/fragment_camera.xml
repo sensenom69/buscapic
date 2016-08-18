@@ -21,13 +21,11 @@
         android:background="@color/colorPrimary"
         android:layout_gravity="left|bottom"
         android:textAlignment="center">
-
         <TextView
             android:id="@+id/textCoordenades"
             android:layout_width="158dp"
             android:layout_height="66dp"
             android:text="Hello World!"
-            android:background="#9b0101"
             android:textColor="#ffffff"
             android:layout_gravity="left|bottom" />
 
@@ -91,5 +89,13 @@
         android:layout_gravity="center_horizontal"
         android:textColor="#fcfbfb"
         android:background="@android:color/holo_blue_light"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:visibility="invisible"
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="141dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="51dp" />
 
 </FrameLayout>
