@@ -51,11 +51,17 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
 
     //Les dades per a tirar la linea
     private double latitut;
-    private double longitud;
+    private double longitut;
     private double angle;
+    //Les dades anteriors per a no tirar la linea altra volta
+    private double latitutVell;
+    private double longitutVell;
+    private double angleVell;
+    private double MARGE_DESV_GPS;
+    private double MARGE_DESV_ANGLE;
     //el desti en km
-    private double latitudDesti;
-    private double longitudDesti;
+    private double latitutDesti;
+    private double longitutDesti;
     private double distancia;
     //private double altitud;
     private ArrayList<Punt> llistaPuntsRetornada = new ArrayList<>();
@@ -116,6 +122,11 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        latitut = 0;
+        longitut = 0;
+        angle = 0;
+        MARGE_DESV_GPS = 0.0001;
+        MARGE_DESV_ANGLE = 0.9;
     }
 
     @Override
@@ -171,31 +182,35 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
             fab.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view){
-
+                    latitutVell = latitut;
+                    longitutVell = longitut;
+                    angleVell = angle;
                     latitut = mlocListener.getLatitud();
-                    longitud = mlocListener.getLongitud();
+                    longitut = mlocListener.getLongitud();
                     angle = brujula.getAngle();
+                    //TODO:aci la comparacio per saber si ha canviat de posiscio
                     //Laboratori
                     //latitut = 39.070622;
                     //longitud = -0.269588;
                     //angle = 177.5;//moduver desde laboratori
                     //Casa
                     latitut = 39.068727;
-                    longitud = -0.291360;
+                    longitut = -0.291360;
                     //angle = 162;//moduver desde casa
                     //angle = 179;//penyalba
                     //angle=50;//Creus
                     distancia = 30;
-                    latitudDesti = getLatDesti(latitut,angle,distancia);
-                    longitudDesti = getLongDesti(longitud,latitut,angle,distancia);
-                    TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
-                    llistaPuntsRetornada.clear();
-                    tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
-                    tareaRecollirAltimetria.setContext(getActivity());
-                    tareaRecollirAltimetria.setVistes((TextView) getActivity().findViewById(R.id.txtAltura),(TextView) getActivity().findViewById(R.id.txtNomPic));
-                    tareaRecollirAltimetria.execute(latitut,longitud,latitudDesti,longitudDesti);
-                    Toast.makeText(getActivity().getApplicationContext(), latitut+" "+longitud+" "+angle, Toast.LENGTH_LONG).show();
-
+                    if (getNovaPosicio()) {
+                        latitut = getLatDesti(latitut, angle, distancia);
+                        longitutDesti = getLongDesti(longitut, latitut, angle, distancia);
+                        TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
+                        llistaPuntsRetornada.clear();
+                        tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
+                        tareaRecollirAltimetria.setContext(getActivity());
+                        tareaRecollirAltimetria.setVistes((TextView) getActivity().findViewById(R.id.txtAltura), (TextView) getActivity().findViewById(R.id.txtNomPic));
+                        tareaRecollirAltimetria.execute(latitut, longitut, latitutDesti, longitutDesti);
+                        Toast.makeText(getActivity().getApplicationContext(), latitut + " " + longitut + " " + angle, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }
@@ -317,8 +332,11 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
 
                     if(progres>0) {
                         if (progres > 10) {
+                            latitutVell = latitut;
+                            longitutVell = longitut;
+                            angleVell = angle;
                             latitut = mlocListener.getLatitud();
-                            longitud = mlocListener.getLongitud();
+                            longitut = mlocListener.getLongitud();
                             angle = brujula.getAngle();
                             //Laboratori
                             //latitut = 39.070622;
@@ -326,17 +344,22 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
                             //angle = 177.5;//moduver desde laboratori
                             //Casa
                             latitut = 39.068727;
-                            longitud = -0.291360;
+                            longitut = -0.291360;
                             //angle = 162;//moduver desde casa
                             //angle = 179;//penyalba
                             //angle=50;//Creus
                             distancia = 30;
-                            latitudDesti = getLatDesti(latitut, angle, distancia);
-                            longitudDesti = getLongDesti(longitud, latitut, angle, distancia);
-                            TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
-                            llistaPuntsRetornada.clear();
-                            tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
-                            tareaRecollirAltimetria.execute(latitut, longitud, latitudDesti, longitudDesti);
+                           ;
+                            if (getNovaPosicio()) {
+                                latitutDesti = getLatDesti(latitut, angle, distancia);
+                                longitutDesti = getLongDesti(longitut, latitut, angle, distancia);
+                                TareaRecollirAltimetria tareaRecollirAltimetria = new TareaRecollirAltimetria();
+                                llistaPuntsRetornada.clear();
+                                tareaRecollirAltimetria.setLlistaPunts(llistaPuntsRetornada);
+                                tareaRecollirAltimetria.setContext(getActivity());
+                                tareaRecollirAltimetria.setVistes((TextView) getActivity().findViewById(R.id.txtAltura), (TextView) getActivity().findViewById(R.id.txtNomPic));
+                                tareaRecollirAltimetria.execute(latitut, longitut, latitutDesti, longitutDesti);
+                            }
                         }
                     }
 
@@ -395,23 +418,21 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
         double latitudRadi =Math.toRadians(lat);
         double grausRadians = Math.toRadians(graus);
         int radiTerra = 6371;
-
         return  Math.toDegrees(Math.asin(Math.sin(latitudRadi)*Math.cos(distancia/radiTerra) + Math.cos(latitudRadi)*Math.sin(distancia/radiTerra)*Math.cos(grausRadians)));
 
     }
 
     public double getLongDesti(double longi, double lat, double graus, double distancia){
-        /*
-        double longitudRadi =longi;
-        double grausRadians = graus;
-        double coseno = Math.cos(grausRadians);
-        double dist = (360*distancia)/(2*3.141516*6371000);
-        double resultatEnGrau = longitudRadi + coseno * dist;
-        */
         int radiTerra = 6371;
         double lati =  getLatDesti(lat,graus,distancia);
         double longitud =Math.toRadians(longi) + Math.atan2(Math.sin(Math.toRadians(angle))*Math.sin(distancia/radiTerra)*Math.cos(Math.toRadians(lat)), Math.cos(distancia/radiTerra)-Math.sin(Math.toRadians(lat))*Math.sin(Math.toRadians(lati)));
         longitud = (Math.toDegrees(longitud)+540)%360-180;
         return longitud;
+    }
+
+    private boolean getNovaPosicio(){
+        if(Math.abs(latitut-latitutVell)<MARGE_DESV_GPS && Math.abs(longitut-longitutVell)<MARGE_DESV_GPS && Math.abs(angle-angleVell)<MARGE_DESV_GPS)
+            return false;
+        return true;
     }
 }
