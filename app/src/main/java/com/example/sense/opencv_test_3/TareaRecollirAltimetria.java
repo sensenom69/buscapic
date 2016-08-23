@@ -32,7 +32,7 @@ import java.util.List;
 public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<Punt>> {
     private final String LOG_TAG = TareaRecollirAltimetria.class.getSimpleName();
     private ArrayList<Punt> llistaPunts = new ArrayList<>();
-    //private TextView textViewAltura;
+    private TextView textViewAltura;
     private TextView textViewNom;
     private int NUM_MIDES = 500;
     private Activity activity;
@@ -47,7 +47,7 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
     }
 
     public void setVistes(TextView textViewAltura, TextView textViewNom){
-        //this.textViewAltura = textViewAltura;
+        this.textViewAltura = textViewAltura;
         this.textViewNom = textViewNom;
     }
     @Override
@@ -165,11 +165,15 @@ public class TareaRecollirAltimetria extends AsyncTask<Double,Integer,ArrayList<
             chart.setVisibility(View.VISIBLE);
             //TODO: fer sols fins elpunt mes alt?
             List<Entry> entries = carregaDadesGrafic(llistaPunts,posPuntMesAlt);
-            LineDataSet dataSet = new LineDataSet(entries, "Label");
-            dataSet.setColor(Color.GREEN);
+            LineDataSet dataSet = new LineDataSet(entries, "Altura");
+            dataSet.setColor(Color.BLUE);
+
             dataSet.setDrawCircles(false);
             chart.setBackgroundColor(Color.TRANSPARENT);
             chart.setDrawGridBackground(false);
+            chart.getXAxis().setTextColor(Color.WHITE);
+            chart.getAxisLeft().setTextColor(Color.WHITE);
+            chart.getAxisRight().setTextColor(Color.WHITE);
             dataSet.setLineWidth(2.5f);
             ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
             dataSets.add(dataSet);

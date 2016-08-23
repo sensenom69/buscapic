@@ -24,10 +24,11 @@
         <TextView
             android:id="@+id/textCoordenades"
             android:layout_width="158dp"
-            android:layout_height="66dp"
-            android:text="Hello World!"
+            android:layout_height="34dp"
+            android:text="Sin señal"
             android:textColor="#ffffff"
-            android:layout_gravity="left|bottom" />
+            android:layout_gravity="left|bottom"
+            android:layout_marginLeft="10dp" />
 
         <TextView
             android:id="@+id/txtAngle"
@@ -35,10 +36,11 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="40dp"
-            android:layout_marginTop="20dp"
-            android:text="Heading: 0.0"
+            android:layout_marginTop="30dp"
+            android:text="Sin señal"
             android:layout_gravity="left|top"
-            android:textColor="#fcfbfb" />
+            android:textColor="#fcfbfb"
+            android:layout_marginLeft="10dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -47,16 +49,8 @@
             android:id="@+id/textDistanciaPeu"
             android:textColor="#ffffff"
             android:layout_gravity="right|center_horizontal"
-            android:layout_marginTop="30dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Distancia"
-            android:id="@+id/textDistancia"
-            android:textColor="#ffffff"
-            android:layout_gravity="right|center_vertical"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="10dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -65,6 +59,58 @@
             android:layout_gravity="center_horizontal|bottom"
             android:layout_margin="@dimen/fab_margin"
             android:src="@android:drawable/ic_dialog_map" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Angulo"
+            android:id="@+id/textLabelAngle"
+            android:layout_gravity="left|top"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:layout_marginLeft="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Posición"
+            android:id="@+id/textLabelPosicion"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginTop="5dp"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:layout_marginLeft="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dist. a pie"
+            android:id="@+id/textLabelDistPeu"
+            android:layout_gravity="right|top"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:layout_marginRight="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distancia recta"
+            android:id="@+id/textLabelDist"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginTop="5dp"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:layout_marginLeft="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distancia"
+            android:id="@+id/textDistancia"
+            android:textColor="#ffffff"
+            android:layout_gravity="right|bottom"
+            android:layout_marginBottom="18dp"
+            android:layout_marginRight="10dp" />
 
     </FrameLayout>
 
@@ -78,7 +124,7 @@
         android:text=""
         android:layout_gravity="center_horizontal"
         android:textColor="#fcfbfb"
-        android:background="@android:color/holo_blue_light"/>
+        android:background="@color/colorPrimary"/>
     <TextView
         android:id="@+id/txtNomPic"
         android:layout_width="wrap_content"
@@ -88,7 +134,7 @@
         android:text=""
         android:layout_gravity="center_horizontal"
         android:textColor="#fcfbfb"
-        android:background="@android:color/holo_blue_light"/>
+        android:background="@color/colorPrimary"/>
 
     <com.github.mikephil.charting.charts.LineChart
         android:visibility="invisible"

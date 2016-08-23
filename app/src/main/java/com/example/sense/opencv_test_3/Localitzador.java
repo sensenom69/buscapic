@@ -34,9 +34,7 @@ public class Localitzador implements LocationListener {
         latitud = loc.getLatitude();
         longitud = loc.getLongitude();
         altitud = loc.getAltitude();
-        String Text = "Mi ubicaci—n actual es: " + "\n Lat = "
-                + loc.getLatitude() + "\n Long = " + loc.getLongitude()+""
-                +"\n bearing = "+loc.getBearing();
+        String Text = "Lat: "+loc.getLatitude() + "\n Long : " + loc.getLongitude();
         textCoordenades.setText(Text);
 
         //Toast.makeText(getApplicationContext(),Text,Toast.LENGTH_LONG);

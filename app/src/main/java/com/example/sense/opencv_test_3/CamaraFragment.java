@@ -125,8 +125,8 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
         latitut = 0;
         longitut = 0;
         angle = 0;
-        MARGE_DESV_GPS = 0.0001;
-        MARGE_DESV_ANGLE = 0.9;
+        MARGE_DESV_GPS = 0.001;
+        MARGE_DESV_ANGLE = 3;
     }
 
     @Override
@@ -282,10 +282,12 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
         int cols = (int) sizeRgba.width;
 
         int left = 0;
-        int top = (rows/4)+25;
+        int top = (rows/4)+55;
 
+        //int width = cols * 3 / 8;
+        //int height = rows * 3 / 7;
         int width = cols * 3 / 8;
-        int height = rows * 3 / 7;
+        int height = rows * 3 / 10;
 
         switch (mOpenCvCameraView.getDisplay().getRotation()) {
             case Surface.ROTATION_0: // Vertical portrait
@@ -297,10 +299,10 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
                 rgbaInnerWindow = mRgba.submat(top, top + height, left, left + width);
                 Mat imageBlurr = mRgba.submat(top, top + height, left, left + width);
 
-                //cantoDretaDalt = new Point(70,height/2.5);
+                cantoDretaDalt = new Point(20,height/2.6);
+                cantoEsquerreBaix =  new Point(width-20,height-70);
+                //cantoDretaDalt = new Point(70,height/2.6);
                 //cantoEsquerreBaix =  new Point(width-20,height-110);
-                cantoDretaDalt = new Point(70,height/2.6);
-                cantoEsquerreBaix =  new Point(width-20,height-110);
 
 
                 Imgproc.GaussianBlur(rgbaInnerWindow, imageBlurr, new Size(5,5), 45);
@@ -325,7 +327,9 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
                 if(llistaMesAlts.size()>0) {
                     int puntMesAltTotal = getPuntMesAlt(llistaMesAlts);
                     llistaMesAlts.get(puntMesAltTotal);
+                    //Imgproc.arrowedLine(rgbaInnerWindow,new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Point(llistaMesAlts.get(puntMesAltTotal).x+30, llistaMesAlts.get(puntMesAltTotal).y+30), new Scalar(0, 0, 255));
                     Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 5, llistaMesAlts.get(puntMesAltTotal).y + 5), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
+                    //Imgproc.rectangle(rgbaInnerWindow, new Point(llistaMesAlts.get(puntMesAltTotal).x + 70, llistaMesAlts.get(puntMesAltTotal).y + 50), new Point(llistaMesAlts.get(puntMesAltTotal).x, llistaMesAlts.get(puntMesAltTotal).y), new Scalar(0, 255, 0));
                     //if(temporitzarLlansament.voltesPasades(cantoDretaDalt,cantoEsquerreBaix,new Point(80,120)))
 
                     int progres = temporitzarLlansament.estaDins(cantoDretaDalt,cantoEsquerreBaix,llistaMesAlts.get(puntMesAltTotal));
@@ -431,7 +435,7 @@ public class CamaraFragment extends Fragment implements CameraBridgeViewBase.CvC
     }
 
     private boolean getNovaPosicio(){
-        if(Math.abs(latitut-latitutVell)<MARGE_DESV_GPS && Math.abs(longitut-longitutVell)<MARGE_DESV_GPS && Math.abs(angle-angleVell)<MARGE_DESV_GPS)
+        if(Math.abs(latitut-latitutVell)<MARGE_DESV_GPS && Math.abs(longitut-longitutVell)<MARGE_DESV_GPS && Math.abs(angle-angleVell)<MARGE_DESV_ANGLE)
             return false;
         return true;
     }

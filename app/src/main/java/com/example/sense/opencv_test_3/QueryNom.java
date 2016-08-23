@@ -91,6 +91,7 @@ public class QueryNom extends AsyncTask<String, Void,String> {
             }catch(Exception e){
                 resposta = "";
             }
+
             Log.v(LOG_TAG, "Resposta string: " + resposta);
 
         }catch (Exception e){
